@@ -1,9 +1,8 @@
 use ExtUtils::MakeMaker;
 WriteMakefile(
               'NAME'	=> 'WWW::Search::Jobserve',
-              'VERSION' => 1.01,
+              'VERSION' => 1.02,
               'PREREQ_PM' => {
-                              #'WWW::Search::Scraper' => 0,
 			      'WWW::Search::Test' => 2.12,
                              },
              );

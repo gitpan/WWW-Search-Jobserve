@@ -1,6 +1,6 @@
 # Jobserve.pm
 # Written by Andy Pritchard.
-# $Id: Jobserve.pm,v 1.01 2003-03-17 18:51:09 $
+# $Id: Jobserve.pm,v 1.02 2003-09-25 16:13:30 ninja $
 
 package WWW::Search::Jobserve;
 
@@ -9,7 +9,7 @@ package WWW::Search::Jobserve;
 use WWW::Search qw( generic_option strip_tags );
 use WWW::Search::Result;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 $MAINTAINER = 'Andy Pritchard <pilchkinstein@hotmail.com>';
 
 # private
@@ -126,10 +126,16 @@ sub parse_tree
      next TABLE unless ref $oFONT;
      print STDERR " +   try TABLE->FONT ===", $oFONT->as_text, "===\n" if 1 < $self->{_debug}; 
      # First A tag contains the url & title:
-     my $oA = $oFONT->look_down('_tag', 'a');
+     my @aoA = $oFONT->look_down('_tag', 'a');
+     my $oA = shift(@aoA);
      next TABLE unless ref $oA;
      next TABLE if (($oA->as_HTML) =~ m!class="ToolBar"!ig);
      print STDERR " +   try TABLE->FONT->A ===", $oA->as_HTML, "===\n" if 1 < $self->{_debug}; 
+     # Occasionally they have these atsco links in there, this skips over in this case.
+     if (($oA->as_HTML) !~ m!\?jobid\=!ig) {
+       $oA = shift(@aoA);
+       print STDERR " +   Re-try TABLE->FONT->A ===", $oA->as_HTML, "===\n" if 1 < $self->{_debug}; 
+     }     
      # Jobserve only gives us a path relative to the _base_url
      my $sURL = $self->{'_base_url'} . $oA->attr('href');
      print STDERR " +   GOT URL:$sURL:\n" if 1 < $self->{_debug}; 
@@ -327,6 +333,11 @@ WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 VERSION HISTORY
+
+=head2 1.02
+
+Altered parse_tree for cases where another href link is inserted before 
+the job title and link
 
 =head2 1.01
 
