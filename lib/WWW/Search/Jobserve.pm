@@ -1,6 +1,6 @@
 # Jobserve.pm
 # Written by Andy Pritchard.
-# $Id: Jobserve.pm,v 1.00 2003-03-13 17:11:09 Exp  $
+# $Id: Jobserve.pm,v 1.01 2003-03-17 18:51:09 $
 
 package WWW::Search::Jobserve;
 
@@ -9,7 +9,7 @@ package WWW::Search::Jobserve;
 use WWW::Search qw( generic_option strip_tags );
 use WWW::Search::Result;
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 $MAINTAINER = 'Andy Pritchard <pilchkinstein@hotmail.com>';
 
 # private
@@ -197,7 +197,7 @@ WWW::Search::Jobserve - backend for searching www.jobserve.com
 
     use WWW::Search;
     my $oSearch = new WWW::Search('Jobserve');
-    my $sQuery = WWW::Search::escape_query("Fast Food Operative");
+    my $sQuery = WWW::Search::escape_query("(Fast Food Operative) and PERL");
     $oSearch->native_query($sQuery, { job_category => 'it' });
     while (my $oResult = $oSearch->next_result())
       { 
@@ -206,10 +206,11 @@ WWW::Search::Jobserve - backend for searching www.jobserve.com
         print $oResult->description, "\n";
       }
 
+    			  	      
 =head1 DESCRIPTION
 
-This class is a Jobserve specialization of WWW::Search.
-It handles making and interpreting Jobserve searches
+This class is a Jobserve specialisation of WWW::Search.
+It handles making, retrieving and interpreting Jobserve searches
 F<http://www.jobserve.com>.
 
 This class exports no public interface; all interaction should
@@ -217,13 +218,24 @@ be done through L<WWW::Search> objects.
 
 =head1 NOTES
 
-The query is applied to TITLES only. See below for retrieving html from links.
+This class can be used to query both the UK and Australian Jobserve sites, see below.
 
-The results are ordered Best Match first (unless 'job_order' => 'DateTime' is specified).
+The search will terminate unless C<job_category> is set in the native_query options.
+
+The results are ordered Best Match first                    
+   (unless 'job_order' => 'DateTime' is specified).
 
 =head1 OPTIONS
 
 =over
+
+Parameters Available: 
+
+F<job_category>
+F<job_type>
+F<job_lookahead>
+F<job_order>
+F<jobserve_site>
 
 =item Job Category
 
@@ -233,10 +245,10 @@ in the native_query options:
   $oSearch->native_query($sQuery, { job_category => 'it' });
   
 The value of this is simply the prefix you see jobserve insert
-into the url once youve clicked beyond the front page. E.g.
+into the url once you've clicked beyond the front page. E.g.
 
-  http://www.it.jobserve.com  
-  http://www.engineering.jobserve.com  
+  http://www.it.jobserve.com  		{ job_category => 'it' }
+  http://www.engineering.jobserve.com   { job_category => 'engineering' }
   
 etc. 
 
@@ -247,26 +259,50 @@ To specifically search for one contract type,
 set 'job_type' => (*|C|P) to the query options:
 
   $oSearch->native_query($sQuery, { job_type => 'C',  job_category => 'it' } );
+
+The search defaults to C<All>
                          
 =item Days Ahead
 
 Choices of how many days to look ahead are (5|4|3|2|1|0).
-The search defaults to 5.
 To specifically search for x working days ahead, 
 set 'job_lookahead' => (5|4|3|2|1|0) to the query options:
 
   $oSearch->native_query($sQuery, { job_lookahead => '2', job_category => 'it' } );
   
+The search defaults to C<5>
+  
 =item Result Order
 
 Choices of how to order results are (Best Match|Latest Job).
-The search defaults to C<Best Match>.
 To alter the result order,
 set 'job_order' => (Rank|DateTime) to the query options:
 
   $oSearch->native_query($sQuery, { job_order => 'DateTime', job_category => 'it' } );
-  
 
+The search defaults to C<Best Match>.
+  
+=item Different Jobserve Sites
+
+There are currently two Jobserve websites supported by this module
+namely United Kingdom and Australia.
+  The search will default to the UK site unless the parameter, 
+'jobserve_site' => (uk|au) is set in the query options:
+
+  $oSearch->native_query($sQuery, { jobserve_site => 'au', job_category => 'it' } );
+  
+The search defaults to C<uk>  
+
+=item 
+
+Invoke all parameters like so:
+
+    $oSearch->native_query($sQuery, { job_category  => 'it', 
+    			  	      job_type 	    => 'C',
+    			  	      job_lookahead => '2',
+    			  	      job_order     => 'DateTime',
+    			  	      jobserve_site => 'au', } );
+    
 =back
 
 =head1 SEE ALSO
@@ -292,9 +328,13 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 VERSION HISTORY
 
+=head2 1.01
+
+Altered POD and added a README
+
 =head2 1.00
 
-First publicly-released version.
+Released to the public.
 
 =cut
 

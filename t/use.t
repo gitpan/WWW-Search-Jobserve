@@ -20,19 +20,19 @@ plan tests => $iNum;
 
 foreach my $sEngine (@as)
   {
-  my $o;
-  # print STDERR " +   trying engine $sEngine ";
-  $sEngine =~ s!\.pm!!;
-  $sEngine =~ s!lib/WWW/Search/!!;
-  $sEngine =~ s!/!::!g;
-  # print STDERR "($sEngine)...\n";
-  eval { $o = new WWW::Search($sEngine) };
-  ok(ref($o));
+    my $o;
+    # print STDERR " +   trying engine $sEngine ";
+    $sEngine =~ s!\.pm!!;
+    $sEngine =~ s!lib/WWW/Search/!!;
+    $sEngine =~ s!/!::!g;
+    # print STDERR "($sEngine)...\n";
+    eval { $o = new WWW::Search($sEngine) };
+    ok(ref($o));
   } # foreach
 
 exit 0;
 
-# Now make sure we get *some* results from *some* engine:
+# Now make sure we get some results:
 my $o = new WWW::Search('Jobserve');
 $o->maximum_to_retrieve(1);
 # $o->{debug} = 9;
